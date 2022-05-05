@@ -37,6 +37,9 @@ These Powershell scripts generate overviews to support building a role model
     - [Details Get-HelloIDPersonGroupMembers](#details-get-helloidpersongroupmembers)
 - [HelloID Docs](#helloid-docs)
 
+## Limitation on the scripts
+For the scripts there is a sync needed from the target to HelloID. For example a sync from the local Active Directory to HelloID. Not every target systeem can synchrochize to HelloID. At the moment only two different target systems (AD and AAD) are tested to correctly sync with the HelloID Directory.
+
 ## User information
 With the local CSV export, you can make a report that gives insight into the current situation in the Active Directory. The exported data can be input for the business rules yet
 to be created. 
@@ -58,17 +61,23 @@ After configuring and running the "Get-HelloIDRoleModel.ps1" or "Get-HelloIDPers
 ## PowerShell setup script
 The PowerShell scripts “Get-HelloIDRoleModel.ps1” and "Get-HelloIDPersonGroupMembers.ps1" contains a complete PowerShell script using the HelloID API to create a report for RoleMining purposes. Please follow the steps below to set up and run the “Get-HelloIDRoleModel.ps1” PowerShell script in your environment. 
 
+1.	Set up a to the HelloID Directory. There are two different target systems Active Directory or Azure Active Directory.
 
-1.	Set up a “[Synchronize AD](https://docs.helloid.com/hc/en-us/articles/360001592994)” automated task in Automation > Tasks 
+- Local Active Directory: Set up a “[Synchronize AD](https://docs.helloid.com/hc/en-us/articles/360001592994)” automated task in Automation > Tasks 
+- AzureAD (only AAD)
+   Enable synchronization with AAD "[Synchronize AAD] (https://docs.helloid.com/hc/en-us/articles/360019160119-Enable-or-disable-Azure-AD-synchronization)" 
+   Because the sync with AAD doesn’t bring the EmployeeId to the HelloID Users. For the script HelloID needs an EmployeeId to correlate the persons and accounts. With "[Sync AzureAD-EmployeeId-HelloID-Users] https://github.com/Tools4everBV/HelloID-Conn-SA-Source-Sync-AzureAD-EmployeeId-HelloID-Users" the EmployeeId can be synced to the HelloID Users. 
+
+-----------
+
 2.	Download the " Get-HelloIDRoleModel.ps1" file
 3.	Open it in your favorite PowerShell console/editor
 4.	Create a HelloID [API key and secret](https://docs.helloid.com/hc/en-us/articles/360002008873-API-Keys-Overview)
 5.	Update the connection and configuration details in the script's header
 6.	Run the script on a machine with PowerShell support and an internet connection
 
-
 ## Update connection and configuration details
-### details Get-HelloIDRoleModel
+### Details Get-HelloIDRoleModel
 | Variable name                 | Description                                                             | Example value                   |
 | ----------------------------- | ----------------------------------------------------------------------- | ------------------------------- |
 | $script:PortalBaseUrl         | Your HelloID portal's URL                                               | https://customer01.helloid.com  |
@@ -88,14 +97,16 @@ The PowerShell scripts “Get-HelloIDRoleModel.ps1” and "Get-HelloIDPersonGrou
 | $apiSecret                    | API secret value of your HelloID environment                            | ********                        |
 | $source                       | The name of the source in HelloID to filter the accounts and groups on  | enyoi.local                     |
 | $exportPath                   | The path where the csv file will be exported (Make sure the exportPath contains a trailing \ in Windows or / in Unix/MacOS environments)   | C:\HelloID\Provisioning\RoleMining_export\PersonGroupMembers\  |
-| $vaultJson                    | The path to the Vault export in JSON format (needs to be manually exported from a HelloID Provisioning snapshot). | C:\HelloID\Provisioning\RoleMining_export\PersonGroupMembers\JSON_file_export\vault.json |
-| $evaluationReportCsv          | The location of the Evaluation Report Csv (needs to be manually exported from a HelloID Provisioning evaluation) (Only required when you want to check the groups against an evaluation report).  | C:\HelloID\Provisioning\RoleMining_export\PersonGroupMembers\Evaluation_Summary_export\EvaluationReport.csv |
 | $evaluationSystemName         | The name of the system on which to check the permissions in the evaluation (Only required when using the evaluation report) | Microsoft Active Directory |
-| $grantedEntitlementsCsv       | The location of the Granted Entitlements Csv (needs to be manually exported from a HelloID Provisioning Granted Entitlements) (Only required when you want to check the groups against a granted entitlements report) | C:\HelloID\Provisioning\RoleMining_export\PersonGroupMembers\Entitlements_export\Entitlements.csv |
 | $entitlementsSystemName       | The name of the system on which to check the permissions in the evaluation (Only required when using the entitlements report) | Microsoft Active Directory |
 | $personCorrelationAttribute   | The person attribute used to correlate a person to an account           | ExternalId                      |
 | $userCorrelationAttribute     | The user attribute used to correlate a person to an account             | employeeId                      |
+VRAAG Waar makkelijk op te zoeken in HelloID hoe de variabele technisch gezien heten voor bijvoorbeeld ExternalId of employeeId
 
+VRAAG Onderstaande eruit halen omdat exportPath ervoor gebruikt kan worden.
+| $vaultJson                    | The path to the Vault export in JSON format (needs to be manually exported from a HelloID Provisioning snapshot). | C:\HelloID\Provisioning\RoleMining_export\PersonGroupMembers\JSON_file_export\vault.json |
+| $evaluationReportCsv          | The location of the Evaluation Report Csv (needs to be manually exported from a HelloID Provisioning evaluation) (Only required when you want to check the groups against an evaluation report).  | C:\HelloID\Provisioning\RoleMining_export\PersonGroupMembers\Evaluation_Summary_export\EvaluationReport.csv |
+| $grantedEntitlementsCsv       | The location of the Granted Entitlements Csv (needs to be manually exported from a HelloID Provisioning Granted Entitlements) (Only required when you want to check the groups against a granted entitlements report) | C:\HelloID\Provisioning\RoleMining_export\PersonGroupMembers\Entitlements_export\Entitlements.csv |
 
 # HelloID Docs
 The official HelloID documentation can be found at: https://docs.helloid.com/
